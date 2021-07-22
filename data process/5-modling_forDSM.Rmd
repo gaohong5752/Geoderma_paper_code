@@ -1,0 +1,3641 @@
+---
+title: "modling_forDSM"
+author: "gaohong"
+date: "2019年6月30日"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#设置工作路径，加载包
+```{r}
+
+library(rgdal)
+library(raster)
+library(randomForest)
+
+```
+
+
+#构建环境因子图层
+```{r}
+setwd("E:/otherWork/02_1/soil2019-rewrite/EnFactor")
+
+files<-c("DEM.tif","Slope.tif","PlanC.tif","ProfileC.tif","TWI.tif","Bedrock.tif","LSF.tif","VD.tif","RSP.tif")
+
+covStack <- raster(files[1])
+for (i in 2:length(files)) {
+  covStack <- stack(covStack, files[i])
+}
+
+#设置读取样点数据路径
+point_shp_folder="E:/otherWork/02_1/soil2019-rewrite/allTrainingSamples_shp/"
+
+#设置最终结果tif的保存路径
+result_tif_folder="E:/otherWork/02_1/soil2019-rewrite/result_mapTif/"
+
+##设置随机数种子
+set.seed(2019)
+
+soil_type<-c(1,3,7,20,21,23,30,31,501,502,503)  # 41样本数量太少，删掉。
+sampleNum_dict<-list()
+
+```
+#单因子分析
+#DEM
+SNA  DEM ns3 15
+```{r}
+mn="All_pSNA_DEM_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns3 15
+```{r}
+mn="All_pRAN_DEM_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns3 30
+```{r}
+mn="All_pSNA_DEM_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns3 30
+```{r}
+mn="All_pRAN_DEM_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns3 45
+```{r}
+mn="All_pSNA_DEM_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns3 45
+```{r}
+mn="All_pRAN_DEM_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns3 60
+```{r}
+mn="All_pSNA_DEM_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns3 60
+```{r}
+mn="All_pRAN_DEM_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns3 75
+```{r}
+mn="All_pSNA_DEM_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns3 75
+```{r}
+mn="All_pRAN_DEM_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns5 15
+```{r}
+mn="All_pSNA_DEM_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns5 15
+```{r}
+mn="All_pRAN_DEM_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns5 30
+```{r}
+mn="All_pSNA_DEM_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns5 30
+```{r}
+mn="All_pRAN_DEM_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns5 45
+```{r}
+mn="All_pSNA_DEM_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns5 45
+```{r}
+mn="All_pRAN_DEM_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns5 60
+```{r}
+mn="All_pSNA_DEM_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns5 60
+```{r}
+mn="All_pRAN_DEM_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  DEM ns5 75
+```{r}
+mn="All_pSNA_DEM_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  DEM ns5 75
+```{r}
+mn="All_pRAN_DEM_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+#Slope
+SNA  Slope ns3 15
+```{r}
+mn="All_pSNA_Slope_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns3 15
+```{r}
+mn="All_pRAN_Slope_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns3 30
+```{r}
+mn="All_pSNA_Slope_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns3 30
+```{r}
+mn="All_pRAN_Slope_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns3 45
+```{r}
+mn="All_pSNA_Slope_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns3 45
+```{r}
+mn="All_pRAN_Slope_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns3 60
+```{r}
+mn="All_pSNA_Slope_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns3 60
+```{r}
+mn="All_pRAN_Slope_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns3 75
+```{r}
+mn="All_pSNA_Slope_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns3 75
+```{r}
+mn="All_pRAN_Slope_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns5 15
+```{r}
+mn="All_pSNA_Slope_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns5 15
+```{r}
+mn="All_pRAN_Slope_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns5 30
+```{r}
+mn="All_pSNA_Slope_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns5 30
+```{r}
+mn="All_pRAN_Slope_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns5 45
+```{r}
+mn="All_pSNA_Slope_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns5 45
+```{r}
+mn="All_pRAN_Slope_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns5 60
+```{r}
+mn="All_pSNA_Slope_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns5 60
+```{r}
+mn="All_pRAN_Slope_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  Slope ns5 75
+```{r}
+mn="All_pSNA_Slope_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  Slope ns5 75
+```{r}
+mn="All_pRAN_Slope_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+#PlanC
+
+SNA  PlanC ns3 15
+```{r}
+mn="All_pSNA_PlanC_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns3 15
+```{r}
+mn="All_pRAN_PlanC_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns3 30
+```{r}
+mn="All_pSNA_PlanC_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns3 30
+```{r}
+mn="All_pRAN_PlanC_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns3 45
+```{r}
+mn="All_pSNA_PlanC_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns3 45
+```{r}
+mn="All_pRAN_PlanC_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns3 60
+```{r}
+mn="All_pSNA_PlanC_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns3 60
+```{r}
+mn="All_pRAN_PlanC_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns3 75
+```{r}
+mn="All_pSNA_PlanC_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns3 75
+```{r}
+mn="All_pRAN_PlanC_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns5 15
+```{r}
+mn="All_pSNA_PlanC_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns5 15
+```{r}
+mn="All_pRAN_PlanC_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns5 30
+```{r}
+mn="All_pSNA_PlanC_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns5 30
+```{r}
+mn="All_pRAN_PlanC_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns5 45
+```{r}
+mn="All_pSNA_PlanC_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns5 45
+```{r}
+mn="All_pRAN_PlanC_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns5 60
+```{r}
+mn="All_pSNA_PlanC_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns5 60
+```{r}
+mn="All_pRAN_PlanC_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  PlanC ns5 75
+```{r}
+mn="All_pSNA_PlanC_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  PlanC ns5 75
+```{r}
+mn="All_pRAN_PlanC_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+#ProfileC
+SNA  ProfileC ns3 15
+```{r}
+mn="All_pSNA_ProfileC_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns3 15
+```{r}
+mn="All_pRAN_ProfileC_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns3 30
+```{r}
+mn="All_pSNA_ProfileC_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns3 30
+```{r}
+mn="All_pRAN_ProfileC_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns3 45
+```{r}
+mn="All_pSNA_ProfileC_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns3 45
+```{r}
+mn="All_pRAN_ProfileC_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns3 60
+```{r}
+mn="All_pSNA_ProfileC_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns3 60
+```{r}
+mn="All_pRAN_ProfileC_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns3 75
+```{r}
+mn="All_pSNA_ProfileC_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns3 75
+```{r}
+mn="All_pRAN_ProfileC_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns5 15
+```{r}
+mn="All_pSNA_ProfileC_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns5 15
+```{r}
+mn="All_pRAN_ProfileC_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns5 30
+```{r}
+mn="All_pSNA_ProfileC_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns5 30
+```{r}
+mn="All_pRAN_ProfileC_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns5 45
+```{r}
+mn="All_pSNA_ProfileC_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns5 45
+```{r}
+mn="All_pRAN_ProfileC_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns5 60
+```{r}
+mn="All_pSNA_ProfileC_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns5 60
+```{r}
+mn="All_pRAN_ProfileC_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  ProfileC ns5 75
+```{r}
+mn="All_pSNA_ProfileC_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  ProfileC ns5 75
+```{r}
+mn="All_pRAN_ProfileC_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+#TWI
+SNA  TWI ns3 15
+```{r}
+mn="All_pSNA_TWI_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns3 15
+```{r}
+mn="All_pRAN_TWI_NS3_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns3 30
+```{r}
+mn="All_pSNA_TWI_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns3 30
+```{r}
+mn="All_pRAN_TWI_NS3_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns3 45
+```{r}
+mn="All_pSNA_TWI_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns3 45
+```{r}
+mn="All_pRAN_TWI_NS3_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns3 60
+```{r}
+mn="All_pSNA_TWI_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns3 60
+```{r}
+mn="All_pRAN_TWI_NS3_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns3 75
+```{r}
+mn="All_pSNA_TWI_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns3 75
+```{r}
+mn="All_pRAN_TWI_NS3_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns5 15
+```{r}
+mn="All_pSNA_TWI_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns5 15
+```{r}
+mn="All_pRAN_TWI_NS5_pen15" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns5 30
+```{r}
+mn="All_pSNA_TWI_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns5 30
+```{r}
+mn="All_pRAN_TWI_NS5_pen30" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns5 45
+```{r}
+mn="All_pSNA_TWI_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns5 45
+```{r}
+mn="All_pRAN_TWI_NS5_pen45" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns5 60
+```{r}
+mn="All_pSNA_TWI_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns5 60
+```{r}
+mn="All_pRAN_TWI_NS5_pen60" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+SNA  TWI ns5 75
+```{r}
+mn="All_pSNA_TWI_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+RAN  TWI ns5 75
+```{r}
+mn="All_pRAN_TWI_NS5_pen75" 
+
+shpPoint<-readOGR(paste(point_shp_folder,mn,".shp",sep = "")) ###
+sampData <- extract(covStack, shpPoint, sp = TRUE,method = "simple") 
+
+sampData<-sampData@data
+
+sampData<-sampData[sampData$soilID %in% soil_type,]
+
+sampData<-na.omit(sampData)
+
+print(dim(sampData))
+
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,
+                       ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+rm("mn","shpPoint","sampData","RF_model","map_RF")
+
+```
+
+#多因子分析
+ns=3
+```{r}
+#
+mn1="All_pSNA_DEM_NS3_pen15"  
+shpPoint1<-readOGR(paste(point_shp_folder,mn1,".shp",sep = "")) ###
+sampData1 <- extract(covStack, shpPoint1, sp = TRUE,method = "simple") 
+sampData1<-sampData1@data
+#
+mn2="All_pSNA_Slope_NS3_pen15"  
+shpPoint2<-readOGR(paste(point_shp_folder,mn2,".shp",sep = "")) ###
+sampData2 <- extract(covStack, shpPoint2, sp = TRUE,method = "simple") 
+sampData2<-sampData2@data
+#
+mn3="All_pSNA_PlanC_NS3_pen15"  
+shpPoint3<-readOGR(paste(point_shp_folder,mn3,".shp",sep = "")) ###
+sampData3 <- extract(covStack, shpPoint3, sp = TRUE,method = "simple") 
+sampData3<-sampData3@data
+#
+mn4="All_pSNA_ProfileC_NS3_pen15"  
+shpPoint4<-readOGR(paste(point_shp_folder,mn4,".shp",sep = "")) ###
+sampData4 <- extract(covStack, shpPoint4, sp = TRUE,method = "simple") 
+sampData4<-sampData4@data
+#
+mn5="All_pSNA_TWI_NS3_pen15"  
+shpPoint5<-readOGR(paste(point_shp_folder,mn5,".shp",sep = "")) ###
+sampData5 <- extract(covStack, shpPoint5, sp = TRUE,method = "simple") 
+sampData5<-sampData5@data
+
+sampData<-rbind(sampData1,sampData2,sampData3,sampData4,sampData5)
+sampData<-na.omit(sampData)
+
+print(nrow(sampData))
+
+mn<-"All_pSNA_5factor_NS3_pen75"
+sampleNum_dict[mn]<-nrow(sampData)
+
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+
+rm(list = c("mn1","shpPoint1","sampData1","mn2","shpPoint2","sampData2","mn3","shpPoint3","sampData3",
+            "mn4","shpPoint4","sampData4","mn5","shpPoint5","sampData5","sampData","RF_model","map_RF"))
+
+```
+
+ns=5
+```{r}
+#
+mn1="All_pSNA_DEM_NS5_pen15"  
+shpPoint1<-readOGR(paste(point_shp_folder,mn1,".shp",sep = "")) ###
+sampData1 <- extract(covStack, shpPoint1, sp = TRUE,method = "simple") 
+sampData1<-sampData1@data
+#
+mn2="All_pSNA_Slope_NS5_pen15"  
+shpPoint2<-readOGR(paste(point_shp_folder,mn2,".shp",sep = "")) ###
+sampData2 <- extract(covStack, shpPoint2, sp = TRUE,method = "simple") 
+sampData2<-sampData2@data
+#
+mn3="All_pSNA_PlanC_NS5_pen15"  
+shpPoint3<-readOGR(paste(point_shp_folder,mn3,".shp",sep = "")) ###
+sampData3 <- extract(covStack, shpPoint3, sp = TRUE,method = "simple") 
+sampData3<-sampData3@data
+#
+mn4="All_pSNA_ProfileC_NS5_pen15"  
+shpPoint4<-readOGR(paste(point_shp_folder,mn4,".shp",sep = "")) ###
+sampData4 <- extract(covStack, shpPoint4, sp = TRUE,method = "simple") 
+sampData4<-sampData4@data
+#
+mn5="All_pSNA_TWI_NS5_pen15"  
+shpPoint5<-readOGR(paste(point_shp_folder,mn5,".shp",sep = "")) ###
+sampData5 <- extract(covStack, shpPoint5, sp = TRUE,method = "simple") 
+sampData5<-sampData5@data
+
+sampData<-rbind(sampData1,sampData2,sampData3,sampData4,sampData5)
+sampData<-na.omit(sampData)
+
+print(nrow(sampData))
+
+mn<-"All_pSNA_5factor_NS5_pen75"
+sampleNum_dict[mn]<-nrow(sampData)
+
+sampData$Bedrock<- droplevels(as.factor(sampData$Bedrock))
+sampData$soilID<- droplevels(as.factor(sampData$soilID))
+
+RF_model<-randomForest(soilID ~.,data = sampData, 
+                       importance = TRUE, proximity = FALSE,ntree=1000,type="classification")
+
+varImpPlot(RF_model)
+print(RF_model)
+
+map_RF <- predict(covStack, RF_model, paste(result_tif_folder,mn,".tif",sep=""),
+                  format = "GTiff", datatype = "FLT4S", overwrite = TRUE)
+
+
+rm(list = c("mn1","shpPoint1","sampData1","mn2","shpPoint2","sampData2","mn3","shpPoint3","sampData3",
+            "mn4","shpPoint4","sampData4","mn5","shpPoint5","sampData5","sampData","RF_model","map_RF"))
+
+```
+
+
+#计算精度
+```{r}
+#设置最终结果tif的保存路径
+result_tif_folder="E:/otherWork/02_1/soil2019-rewrite/result_mapTif/"
+
+result_map_name<-c("All_pSNA_DEM_NS3_pen15","All_pSNA_DEM_NS5_pen15","All_pRAN_DEM_NS3_pen15","All_pRAN_DEM_NS5_pen15",
+                   "All_pSNA_DEM_NS3_pen30","All_pSNA_DEM_NS5_pen30","All_pRAN_DEM_NS3_pen30","All_pRAN_DEM_NS5_pen30",
+                   "All_pSNA_DEM_NS3_pen45","All_pSNA_DEM_NS5_pen45","All_pRAN_DEM_NS3_pen45","All_pRAN_DEM_NS5_pen45",
+                   "All_pSNA_DEM_NS3_pen60","All_pSNA_DEM_NS5_pen60","All_pRAN_DEM_NS3_pen60","All_pRAN_DEM_NS5_pen60",
+                   "All_pSNA_DEM_NS3_pen75","All_pSNA_DEM_NS5_pen75","All_pRAN_DEM_NS3_pen75","All_pRAN_DEM_NS5_pen75",
+                    "All_pSNA_Slope_NS3_pen15","All_pSNA_Slope_NS5_pen15","All_pRAN_Slope_NS3_pen15","All_pRAN_Slope_NS5_pen15",
+                   "All_pSNA_Slope_NS3_pen30","All_pSNA_Slope_NS5_pen30","All_pRAN_Slope_NS3_pen30","All_pRAN_Slope_NS5_pen30",
+                   "All_pSNA_Slope_NS3_pen45","All_pSNA_Slope_NS5_pen45","All_pRAN_Slope_NS3_pen45","All_pRAN_Slope_NS5_pen45",
+                   "All_pSNA_Slope_NS3_pen60","All_pSNA_Slope_NS5_pen60","All_pRAN_Slope_NS3_pen60","All_pRAN_Slope_NS5_pen60",
+                   "All_pSNA_Slope_NS3_pen75","All_pSNA_Slope_NS5_pen75","All_pRAN_Slope_NS3_pen75","All_pRAN_Slope_NS5_pen75",
+                   "All_pSNA_PlanC_NS3_pen15","All_pSNA_PlanC_NS5_pen15","All_pRAN_PlanC_NS3_pen15","All_pRAN_PlanC_NS5_pen15",
+                   "All_pSNA_PlanC_NS3_pen30","All_pSNA_PlanC_NS5_pen30","All_pRAN_PlanC_NS3_pen30","All_pRAN_PlanC_NS5_pen30",
+                   "All_pSNA_PlanC_NS3_pen45","All_pSNA_PlanC_NS5_pen45","All_pRAN_PlanC_NS3_pen45","All_pRAN_PlanC_NS5_pen45",
+                   "All_pSNA_PlanC_NS3_pen60","All_pSNA_PlanC_NS5_pen60","All_pRAN_PlanC_NS3_pen60","All_pRAN_PlanC_NS5_pen60",
+                   "All_pSNA_PlanC_NS3_pen75","All_pSNA_PlanC_NS5_pen75","All_pRAN_PlanC_NS3_pen75","All_pRAN_PlanC_NS5_pen75",
+                   "All_pSNA_ProfileC_NS3_pen15","All_pSNA_ProfileC_NS5_pen15","All_pRAN_ProfileC_NS3_pen15","All_pRAN_ProfileC_NS5_pen15",
+                   "All_pSNA_ProfileC_NS3_pen30","All_pSNA_ProfileC_NS5_pen30","All_pRAN_ProfileC_NS3_pen30","All_pRAN_ProfileC_NS5_pen30",
+                   "All_pSNA_ProfileC_NS3_pen45","All_pSNA_ProfileC_NS5_pen45","All_pRAN_ProfileC_NS3_pen45","All_pRAN_ProfileC_NS5_pen45",
+                   "All_pSNA_ProfileC_NS3_pen60","All_pSNA_ProfileC_NS5_pen60","All_pRAN_ProfileC_NS3_pen60","All_pRAN_ProfileC_NS5_pen60",
+                   "All_pSNA_ProfileC_NS3_pen75","All_pSNA_ProfileC_NS5_pen75","All_pRAN_ProfileC_NS3_pen75","All_pRAN_ProfileC_NS5_pen75",
+                    "All_pSNA_TWI_NS3_pen15","All_pSNA_TWI_NS5_pen15","All_pRAN_TWI_NS3_pen15","All_pRAN_TWI_NS5_pen15",
+                   "All_pSNA_TWI_NS3_pen30","All_pSNA_TWI_NS5_pen30","All_pRAN_TWI_NS3_pen30","All_pRAN_TWI_NS5_pen30",
+                   "All_pSNA_TWI_NS3_pen45","All_pSNA_TWI_NS5_pen45","All_pRAN_TWI_NS3_pen45","All_pRAN_TWI_NS5_pen45",
+                   "All_pSNA_TWI_NS3_pen60","All_pSNA_TWI_NS5_pen60","All_pRAN_TWI_NS3_pen60","All_pRAN_TWI_NS5_pen60",
+                   "All_pSNA_TWI_NS3_pen75","All_pSNA_TWI_NS5_pen75","All_pRAN_TWI_NS3_pen75","All_pRAN_TWI_NS5_pen75",
+                   "All_pSNA_5factor_NS3_pen15","All_pSNA_5factor_NS5_pen15")
+
+resultCovStack<-raster(paste(result_tif_folder,result_map_name[1],".tif",sep = ""))
+for (i in 2:length(result_map_name)) {
+  resultCovStack <- stack(resultCovStack, raster(paste(result_tif_folder,result_map_name[i],".tif",sep = "")))
+}
+
+validationPoint<-readOGR(paste(result_tif_folder,"validationPoint.shp",sep = "")) ###
+
+
+vp_data <- extract(resultCovStack, validationPoint, sp = TRUE,method = "simple") 
+vp_data<-na.omit(vp_data@data)
+
+
+vp_data<-vp_data[vp_data$trueType %in% soil_type,]
+
+print(nrow(vp_data))
+
+precision_df<-data.frame("method"=rep(NA,length(result_map_name)),
+                         "factor"=rep(NA,length(result_map_name)),
+                         "NS"=rep(NA,length(result_map_name)),
+                         "percent"=rep(NA,length(result_map_name)),
+                         "precisionValue"=rep(NA,length(result_map_name)),
+                         "sampleNum"=rep(NA,length(result_map_name)))
+
+for (i in 1:length(result_map_name)){
+  fna<-result_map_name[i]
+  ns_split<-unlist(strsplit(fna,"_"))
+  if (length(ns_split)==5){
+    precision_df[i,]$method<-ns_split[2]
+    precision_df[i,]$factor<-ns_split[3]
+    precision_df[i,]$NS<-ns_split[4]
+    precision_df[i,]$percent<-ns_split[5]
+    precision_df[i,]$precisionValue<-round( sum(vp_data$trueType==vp_data[fna])/nrow(vp_data),4)
+    precision_df[i,]$sampleNum<-as.vector(unlist(sampleNum_dict[fna]))
+  }
+
+}
+
+precision_oldSoilMap<-round( sum(vp_data$trueType==vp_data$oldSoilMap)/nrow(vp_data),4)
+print(precision_oldSoilMap)
+
+print(precision_df)
+
+write.csv(precision_df,"结果精度.csv",row.names = F,fileEncoding="utf-8")
+
+```
+
